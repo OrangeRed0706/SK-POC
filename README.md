@@ -11,32 +11,24 @@
 - **對話鏈**: 維護多輪對話上下文
 - **函數呼叫**: 展示 Semantic Kernel 函數與 Claude 的結合
 
-## 專案結構
+## 快速開始
 
-```
-POC0712/
-├── SemanticKernel.Claude.POC.csproj  # 專案檔案
-├── appsettings.json                   # 設定檔
-├── Program.cs                         # 主程式入口
-├── Models/
-│   └── AnthropicSettings.cs          # Claude 設定模型
-├── Services/
-│   └── ClaudeSemanticKernelService.cs # 主要服務類別
-└── Examples/
-    └── ClaudeIntegrationExamples.cs   # 整合範例
-```
-
-## 安裝與設定
-
-### 1. 安裝相依套件
+### 1. 複製專案
 
 ```bash
-dotnet restore
+git clone https://github.com/OrangeRed0706/SK-POC.git
+cd SK-POC
 ```
 
 ### 2. 設定 API Key
 
-在 `appsettings.json` 中設定您的 Anthropic API Key:
+複製範例設定檔並填入您的 Anthropic API Key:
+
+```bash
+cp appsettings.example.json appsettings.json
+```
+
+編輯 `appsettings.json`:
 
 ```json
 {
@@ -47,19 +39,35 @@ dotnet restore
 }
 ```
 
-### 3. 執行專案
+### 3. 安裝與執行
 
 ```bash
+dotnet restore
+dotnet build
 dotnet run
+```
+
+## 專案結構
+
+```
+SK-POC/
+├── SemanticKernel.Claude.POC.csproj  # 專案檔案
+├── appsettings.example.json          # 設定檔範本
+├── Program.cs                        # 主程式入口
+├── Models/
+│   └── AnthropicSettings.cs         # Claude 設定模型
+├── Services/
+│   ├── ClaudeSemanticKernelService.cs # 主要服務類別
+│   └── ClaudeChatCompletionService.cs # SK 聊天完成服務
+└── Examples/
+    └── ClaudeIntegrationExamples.cs  # 整合範例
 ```
 
 ## 使用的套件版本
 
 - **Microsoft.SemanticKernel**: 1.60.0 (最新穩定版)
 - **Anthropic.SDK**: 5.4.3 (功能完整的非官方 SDK)
-- **Microsoft.Extensions.Configuration**: 8.0.0
-- **Microsoft.Extensions.DependencyInjection**: 8.0.0
-- **Microsoft.Extensions.Logging**: 8.0.0
+- **Microsoft.Extensions.***: 8.0.1+ (相依套件)
 
 ## 核心功能展示
 
@@ -92,6 +100,13 @@ dotnet run
 2. **插件模式**: 將 Claude 包裝成 Semantic Kernel 插件
 3. **服務層整合**: 透過服務層統一管理兩個 SDK
 4. **配置管理**: 使用 .NET 的配置系統管理 API 金鑰和設定
+5. **自訂聊天完成服務**: 實作 IChatCompletionService 介面
+
+## 安全性
+
+- ✅ API Key 已被 `.gitignore` 排除，不會推送到版本控制
+- ✅ 提供 `appsettings.example.json` 作為設定範本
+- ✅ 所有敏感設定都從程式碼中分離
 
 ## 注意事項
 
