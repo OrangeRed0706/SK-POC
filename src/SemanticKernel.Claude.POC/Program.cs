@@ -2,9 +2,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SemanticKernel.Claude.POC.Models;
+using SemanticKernel.Claude.POC.Configuration;
 using SemanticKernel.Claude.POC.Services;
 using SemanticKernel.Claude.POC.Examples;
+using SemanticKernel.Claude.POC.Abstractions;
+using SemanticKernel.Claude.POC.Providers;
 
 namespace SemanticKernel.Claude.POC;
 
@@ -34,8 +36,9 @@ class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
-                services.Configure<AnthropicSettings>(
-                    context.Configuration.GetSection("AnthropicSettings"));
+                // Configure settings
+                services.Configure<AISettings>(
+                    context.Configuration.GetSection("AISettings"));
                 
                 services.AddLogging(builder =>
                 {
@@ -43,33 +46,52 @@ class Program
                     builder.SetMinimumLevel(LogLevel.Information);
                 });
 
-                services.AddSingleton<ClaudeSemanticKernelService>();
+                // Register AI providers
+                services.AddSingleton<ClaudeProvider>();
+                services.AddSingleton<OpenAIProvider>();
+                services.AddSingleton<AzureOpenAIProvider>();
+                services.AddSingleton<GeminiProvider>();
+                
+                // Register factory and services
+                services.AddSingleton<IAIProviderFactory, AIProviderFactory>();
+                services.AddSingleton<MultiProviderService>();
                 services.AddSingleton<ClaudeIntegrationExamples>();
             });
 
     static async Task RunDemoAsync(IServiceProvider services)
     {
-        var mainService = services.GetRequiredService<ClaudeSemanticKernelService>();
+        var multiProviderService = services.GetRequiredService<MultiProviderService>();
         var examples = services.GetRequiredService<ClaudeIntegrationExamples>();
 
-        await RunInteractiveDemo(mainService, examples);
+        await RunInteractiveDemo(multiProviderService, examples);
     }
 
-    static async Task RunInteractiveDemo(ClaudeSemanticKernelService service, ClaudeIntegrationExamples examples)
+    static async Task RunInteractiveDemo(MultiProviderService service, ClaudeIntegrationExamples examples)
     {
         while (true)
         {
-            Console.WriteLine("\n選擇示範類型:");
-            Console.WriteLine("1. 基本 Claude API 呼叫");
-            Console.WriteLine("2. Semantic Kernel 基本功能");
-            Console.WriteLine("3. 整合式處理 (Claude + SK)");
-            Console.WriteLine("4. 串流回應");
-            Console.WriteLine("5. 對話鏈範例");
-            Console.WriteLine("6. 函數呼叫範例");
-            Console.WriteLine("7. 自訂訊息測試");
+            Console.WriteLine("\n=== 多 AI 提供者展示 ===");
+            
+            var availableProviders = service.GetAvailableProviderNames().ToList();
+            if (availableProviders.Any())
+            {
+                Console.WriteLine("可用的 AI 提供者：");
+                foreach (var provider in availableProviders)
+                {
+                    Console.WriteLine($"  • {provider}");
+                }
+                Console.WriteLine();
+            }
+            
+            Console.WriteLine("選擇示範類型:");
+            Console.WriteLine("1. 單一提供者測試");
+            Console.WriteLine("2. 多提供者比較");
+            Console.WriteLine("3. 整合式處理 (多提供者協作)");
+            Console.WriteLine("4. 串流回應測試");
+            Console.WriteLine("5. 自訂訊息測試");
             Console.WriteLine("0. 離開");
             Console.WriteLine();
-            Console.Write("請選擇 (0-7): ");
+            Console.Write("請選擇 (0-5): ");
 
             var choice = Console.ReadLine();
             Console.WriteLine();
@@ -79,10 +101,10 @@ class Program
                 switch (choice)
                 {
                     case "1":
-                        await examples.RunBasicClaudeExampleAsync();
+                        await RunSingleProviderDemo(service);
                         break;
                     case "2":
-                        await RunSemanticKernelDemo(service);
+                        await RunMultiProviderComparison(service);
                         break;
                     case "3":
                         await RunIntegratedDemo(service);
@@ -91,12 +113,6 @@ class Program
                         await RunStreamingDemo(service);
                         break;
                     case "5":
-                        await examples.RunConversationChainExampleAsync();
-                        break;
-                    case "6":
-                        await examples.RunFunctionCallingExampleAsync();
-                        break;
-                    case "7":
                         await RunCustomMessageDemo(service);
                         break;
                     case "0":
@@ -122,45 +138,114 @@ class Program
         }
     }
 
-    static async Task RunSemanticKernelDemo(ClaudeSemanticKernelService service)
+    static async Task RunSingleProviderDemo(MultiProviderService service)
     {
-        Console.WriteLine("=== Semantic Kernel 基本功能展示 ===");
-        var testMessage = "請解釋什麼是人工智慧，並給出3個實際應用例子";
+        Console.WriteLine("=== 單一提供者測試 ===");
         
-        Console.WriteLine($"測試訊息: {testMessage}");
-        Console.WriteLine("處理中...");
-        
-        var result = await service.ProcessWithSemanticKernelAsync(testMessage);
-        Console.WriteLine($"結果: {result}");
+        var availableProviders = service.GetAvailableProviderTypes().ToList();
+        if (!availableProviders.Any())
+        {
+            Console.WriteLine("沒有可用的 AI 提供者。請檢查設定檔。");
+            return;
+        }
+
+        Console.WriteLine("選擇要測試的提供者：");
+        for (int i = 0; i < availableProviders.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {availableProviders[i]}");
+        }
+        Console.Write("請選擇: ");
+
+        if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= availableProviders.Count)
+        {
+            var selectedProvider = availableProviders[choice - 1];
+            var testMessage = "請解釋什麼是人工智慧，並給出3個實際應用例子";
+
+            Console.WriteLine($"\n使用 {selectedProvider} 處理訊息...");
+            Console.WriteLine($"測試訊息: {testMessage}");
+            Console.WriteLine("處理中...\n");
+
+            var result = await service.ProcessWithProviderAsync(selectedProvider, testMessage);
+            Console.WriteLine($"結果: {result}");
+        }
+        else
+        {
+            Console.WriteLine("無效選擇。");
+        }
     }
 
-    static async Task RunIntegratedDemo(ClaudeSemanticKernelService service)
+    static async Task RunMultiProviderComparison(MultiProviderService service)
     {
-        Console.WriteLine("=== 整合式處理展示 ===");
-        var testMessage = "什麼是機器學習？它如何改變我們的生活？";
+        Console.WriteLine("=== 多提供者比較 ===");
+        
+        var availableProviders = service.GetAvailableProviderTypes().ToList();
+        if (availableProviders.Count < 2)
+        {
+            Console.WriteLine("需要至少2個已設定的提供者進行比較。");
+            return;
+        }
+
+        var testMessage = "什麼是機器學習？請用簡單的詞彙解釋。";
+        Console.WriteLine($"測試訊息: {testMessage}");
+        Console.WriteLine("\n開始比較不同提供者的回應...\n");
+
+        foreach (var provider in availableProviders.Take(3)) // 限制最多3個提供者
+        {
+            try
+            {
+                Console.WriteLine($"=== {provider} ===");
+                var result = await service.ProcessWithProviderAsync(provider, testMessage);
+                Console.WriteLine(result);
+                Console.WriteLine();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{provider} 發生錯誤: {ex.Message}");
+                Console.WriteLine();
+            }
+        }
+    }
+
+    static async Task RunIntegratedDemo(MultiProviderService service)
+    {
+        Console.WriteLine("=== 整合式處理展示 (多提供者協作) ===");
+        var testMessage = "什麼是量子計算？它的未來發展如何？";
         
         Console.WriteLine($"測試訊息: {testMessage}");
-        Console.WriteLine("處理中...");
+        Console.WriteLine("處理中...\n");
         
-        var result = await service.ProcessWithIntegratedApproachAsync(testMessage);
+        var result = await service.ProcessIntegratedApproachAsync(testMessage);
         Console.WriteLine(result);
     }
 
-    static async Task RunStreamingDemo(ClaudeSemanticKernelService service)
+    static async Task RunStreamingDemo(MultiProviderService service)
     {
-        Console.WriteLine("=== 串流回應展示 ===");
-        var testMessage = "請寫一首關於程式設計的短詩";
+        Console.WriteLine("=== 串流回應測試 ===");
         
+        var availableProviders = service.GetAvailableProviderTypes().ToList();
+        if (!availableProviders.Any())
+        {
+            Console.WriteLine("沒有可用的 AI 提供者。");
+            return;
+        }
+
+        var provider = availableProviders.First();
+        var testMessage = "請寫一首關於人工智慧的短詩";
+        
+        Console.WriteLine($"使用 {provider} 測試串流回應");
         Console.WriteLine($"測試訊息: {testMessage}");
         Console.WriteLine("串流回應:");
         Console.WriteLine("---");
         
-        await service.ProcessWithStreamingAsync(testMessage);
+        await foreach (var chunk in service.ProcessWithProviderStreamAsync(provider, testMessage))
+        {
+            Console.Write(chunk);
+        }
         
-        Console.WriteLine("---");
+        Console.WriteLine("\n---");
     }
 
-    static async Task RunCustomMessageDemo(ClaudeSemanticKernelService service)
+    static async Task RunCustomMessageDemo(MultiProviderService service)
     {
         Console.WriteLine("=== 自訂訊息測試 ===");
         Console.Write("請輸入您的訊息: ");
@@ -172,35 +257,78 @@ class Program
             return;
         }
 
+        var availableProviders = service.GetAvailableProviderTypes().ToList();
+        if (!availableProviders.Any())
+        {
+            Console.WriteLine("沒有可用的 AI 提供者。");
+            return;
+        }
+
         Console.WriteLine("\n選擇處理方式:");
-        Console.WriteLine("1. 僅使用 Claude API");
-        Console.WriteLine("2. 僅使用 Semantic Kernel");
-        Console.WriteLine("3. 整合式處理");
+        Console.WriteLine("1. 選擇特定提供者");
+        Console.WriteLine("2. 使用預設提供者");
+        Console.WriteLine("3. 整合式處理 (多提供者)");
         Console.WriteLine("4. 串流回應");
         Console.Write("請選擇 (1-4): ");
 
         var method = Console.ReadLine();
-        Console.WriteLine("\n處理中...");
+        Console.WriteLine();
 
         switch (method)
         {
             case "1":
-                var claudeResult = await service.ProcessWithClaudeDirectAsync(userMessage);
-                Console.WriteLine($"Claude 回應: {claudeResult}");
+                Console.WriteLine("選擇提供者：");
+                for (int i = 0; i < availableProviders.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {availableProviders[i]}");
+                }
+                Console.Write("請選擇: ");
+                
+                if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= availableProviders.Count)
+                {
+                    var selectedProvider = availableProviders[choice - 1];
+                    Console.WriteLine($"\n使用 {selectedProvider} 處理中...");
+                    var result = await service.ProcessWithProviderAsync(selectedProvider, userMessage);
+                    Console.WriteLine($"回應: {result}");
+                }
+                else
+                {
+                    Console.WriteLine("無效選擇。");
+                }
                 break;
             case "2":
-                var skResult = await service.ProcessWithSemanticKernelAsync(userMessage);
-                Console.WriteLine($"Semantic Kernel 回應: {skResult}");
+                Console.WriteLine("使用預設提供者處理中...");
+                var defaultResult = await service.ProcessWithDefaultProviderAsync(userMessage);
+                Console.WriteLine($"回應: {defaultResult}");
                 break;
             case "3":
-                var integratedResult = await service.ProcessWithIntegratedApproachAsync(userMessage);
+                Console.WriteLine("使用多提供者整合處理中...");
+                var integratedResult = await service.ProcessIntegratedApproachAsync(userMessage);
                 Console.WriteLine(integratedResult);
                 break;
             case "4":
-                Console.WriteLine("串流回應:");
-                Console.WriteLine("---");
-                await service.ProcessWithStreamingAsync(userMessage);
-                Console.WriteLine("---");
+                Console.WriteLine("選擇提供者進行串流：");
+                for (int i = 0; i < availableProviders.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {availableProviders[i]}");
+                }
+                Console.Write("請選擇: ");
+                
+                if (int.TryParse(Console.ReadLine(), out int streamChoice) && streamChoice > 0 && streamChoice <= availableProviders.Count)
+                {
+                    var streamProvider = availableProviders[streamChoice - 1];
+                    Console.WriteLine($"\n使用 {streamProvider} 串流回應:");
+                    Console.WriteLine("---");
+                    await foreach (var chunk in service.ProcessWithProviderStreamAsync(streamProvider, userMessage))
+                    {
+                        Console.Write(chunk);
+                    }
+                    Console.WriteLine("\n---");
+                }
+                else
+                {
+                    Console.WriteLine("無效選擇。");
+                }
                 break;
             default:
                 Console.WriteLine("無效選擇。");

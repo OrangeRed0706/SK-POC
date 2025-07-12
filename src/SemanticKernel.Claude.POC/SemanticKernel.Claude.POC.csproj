@@ -8,8 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Semantic Kernel Core -->
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.60.0" />
+    
+    <!-- AI Provider Connectors -->
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.60.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.60.0-alpha" />
     <PackageReference Include="Anthropic.SDK" Version="5.4.3" />
+    
+    <!-- Configuration and Hosting -->
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
