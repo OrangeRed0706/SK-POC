@@ -1,15 +1,19 @@
-# .NET Semantic Kernel + Claude C# SDK POC
+# Multi-AI Provider Semantic Kernel POC
 
-這是一個展示如何結合 .NET Semantic Kernel 和 Anthropic Claude C# SDK 的概念驗證專案。
+這是一個展示如何整合多個 AI 提供者與 .NET Semantic Kernel 的概念驗證專案，支援 Claude、OpenAI、Azure OpenAI 和 Google Gemini。
 
 ## 功能特色
 
-- **雙重整合**: 同時使用 Semantic Kernel 1.60.0 和 Anthropic.SDK 5.4.3
-- **多種處理方式**: 支援直接 Claude API 呼叫、Semantic Kernel 處理、整合式處理
-- **串流支援**: 實時顯示 Claude 回應
-- **插件系統**: 將 Claude 封裝為 Semantic Kernel 插件
-- **對話鏈**: 維護多輪對話上下文
-- **函數呼叫**: 展示 Semantic Kernel 函數與 Claude 的結合
+- **🤖 多 AI 提供者支援**: 
+  - Claude (Anthropic.SDK 5.4.3)
+  - OpenAI GPT-4o (Semantic Kernel)
+  - Azure OpenAI (Semantic Kernel)
+  - Google Gemini (Semantic Kernel Alpha)
+- **🔄 智慧提供者管理**: 自動偵測可用提供者、優雅的錯誤處理
+- **⚡ 多種處理模式**: 單一提供者測試、多提供者比較、協作式處理
+- **📡 串流支援**: 所有提供者的實時回應
+- **🎛️ 靈活配置**: 每個提供者的獨立設定和模型選擇
+- **🔀 動態切換**: 執行時選擇和比較不同 AI 提供者
 
 ## 快速開始
 
