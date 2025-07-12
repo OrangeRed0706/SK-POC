@@ -2,10 +2,10 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
-using SemanticKernel.Claude.POC.Models;
+using SemanticKernel.MultiProvider.POC.Models;
 using System.Runtime.CompilerServices;
 
-namespace SemanticKernel.Claude.POC.Services;
+namespace SemanticKernel.MultiProvider.POC.Services;
 
 public class ClaudeChatCompletionService : IChatCompletionService
 {

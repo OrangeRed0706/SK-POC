@@ -3,36 +3,37 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using SemanticKernel.Claude.POC.Abstractions;
-using SemanticKernel.Claude.POC.Configuration;
+using SemanticKernel.MultiProvider.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Configuration;
 using System.Runtime.CompilerServices;
 
-namespace SemanticKernel.Claude.POC.Providers;
+namespace SemanticKernel.MultiProvider.POC.Providers;
 
-public class OpenAIProvider : AIProviderBase
+public class AzureOpenAIProvider : AIProviderBase
 {
-    private readonly OpenAISettings _settings;
+    private readonly AzureOpenAISettings _settings;
     private readonly IChatCompletionService _chatService;
 
-    public OpenAIProvider(IOptions<AISettings> settings, ILogger<OpenAIProvider> logger) 
+    public AzureOpenAIProvider(IOptions<AISettings> settings, ILogger<AzureOpenAIProvider> logger) 
         : base(logger)
     {
-        _settings = settings.Value.OpenAI;
+        _settings = settings.Value.AzureOpenAI;
         
         var kernelBuilder = Kernel.CreateBuilder();
-        kernelBuilder.AddOpenAIChatCompletion(
-            modelId: _settings.Model,
+        kernelBuilder.AddAzureOpenAIChatCompletion(
+            deploymentName: _settings.DeploymentName,
+            endpoint: _settings.Endpoint,
             apiKey: _settings.ApiKey,
-            orgId: _settings.Organization
+            apiVersion: _settings.ApiVersion
         );
         
         var kernel = kernelBuilder.Build();
         _chatService = kernel.GetRequiredService<IChatCompletionService>();
     }
 
-    public override string Name => "OpenAI";
-    public override string Model => _settings.Model;
-    public override bool IsConfigured => !string.IsNullOrEmpty(_settings.ApiKey);
+    public override string Name => "Azure OpenAI";
+    public override string Model => _settings.DeploymentName;
+    public override bool IsConfigured => !string.IsNullOrEmpty(_settings.ApiKey) && !string.IsNullOrEmpty(_settings.Endpoint);
 
     public override async Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default)
     {
@@ -59,7 +60,7 @@ public class OpenAIProvider : AIProviderBase
         }
         catch (Exception ex)
         {
-            LogError(ex, "Failed to send message to OpenAI");
+            LogError(ex, "Failed to send message to Azure OpenAI");
             throw;
         }
     }

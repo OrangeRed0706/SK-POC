@@ -2,11 +2,11 @@ using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Logging;
-using SemanticKernel.Claude.POC.Models;
+using SemanticKernel.MultiProvider.POC.Models;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
 
-namespace SemanticKernel.Claude.POC.Examples;
+namespace SemanticKernel.MultiProvider.POC.Examples;
 
 public class ClaudeIntegrationExamples
 {

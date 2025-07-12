@@ -3,11 +3,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
-using SemanticKernel.Claude.POC.Abstractions;
-using SemanticKernel.Claude.POC.Configuration;
+using SemanticKernel.MultiProvider.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Configuration;
 using System.Runtime.CompilerServices;
 
-namespace SemanticKernel.Claude.POC.Providers;
+namespace SemanticKernel.MultiProvider.POC.Providers;
 
 public class GeminiProvider : AIProviderBase
 {

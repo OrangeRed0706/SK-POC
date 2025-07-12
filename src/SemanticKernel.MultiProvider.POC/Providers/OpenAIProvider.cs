@@ -3,37 +3,36 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using SemanticKernel.Claude.POC.Abstractions;
-using SemanticKernel.Claude.POC.Configuration;
+using SemanticKernel.MultiProvider.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Configuration;
 using System.Runtime.CompilerServices;
 
-namespace SemanticKernel.Claude.POC.Providers;
+namespace SemanticKernel.MultiProvider.POC.Providers;
 
-public class AzureOpenAIProvider : AIProviderBase
+public class OpenAIProvider : AIProviderBase
 {
-    private readonly AzureOpenAISettings _settings;
+    private readonly OpenAISettings _settings;
     private readonly IChatCompletionService _chatService;
 
-    public AzureOpenAIProvider(IOptions<AISettings> settings, ILogger<AzureOpenAIProvider> logger) 
+    public OpenAIProvider(IOptions<AISettings> settings, ILogger<OpenAIProvider> logger) 
         : base(logger)
     {
-        _settings = settings.Value.AzureOpenAI;
+        _settings = settings.Value.OpenAI;
         
         var kernelBuilder = Kernel.CreateBuilder();
-        kernelBuilder.AddAzureOpenAIChatCompletion(
-            deploymentName: _settings.DeploymentName,
-            endpoint: _settings.Endpoint,
+        kernelBuilder.AddOpenAIChatCompletion(
+            modelId: _settings.Model,
             apiKey: _settings.ApiKey,
-            apiVersion: _settings.ApiVersion
+            orgId: _settings.Organization
         );
         
         var kernel = kernelBuilder.Build();
         _chatService = kernel.GetRequiredService<IChatCompletionService>();
     }
 
-    public override string Name => "Azure OpenAI";
-    public override string Model => _settings.DeploymentName;
-    public override bool IsConfigured => !string.IsNullOrEmpty(_settings.ApiKey) && !string.IsNullOrEmpty(_settings.Endpoint);
+    public override string Name => "OpenAI";
+    public override string Model => _settings.Model;
+    public override bool IsConfigured => !string.IsNullOrEmpty(_settings.ApiKey);
 
     public override async Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default)
     {
@@ -60,7 +59,7 @@ public class AzureOpenAIProvider : AIProviderBase
         }
         catch (Exception ex)
         {
-            LogError(ex, "Failed to send message to Azure OpenAI");
+            LogError(ex, "Failed to send message to OpenAI");
             throw;
         }
     }

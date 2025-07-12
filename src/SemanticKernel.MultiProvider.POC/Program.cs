@@ -2,19 +2,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SemanticKernel.Claude.POC.Configuration;
-using SemanticKernel.Claude.POC.Services;
-using SemanticKernel.Claude.POC.Examples;
-using SemanticKernel.Claude.POC.Abstractions;
-using SemanticKernel.Claude.POC.Providers;
+using SemanticKernel.MultiProvider.POC.Configuration;
+using SemanticKernel.MultiProvider.POC.Services;
+using SemanticKernel.MultiProvider.POC.Examples;
+using SemanticKernel.MultiProvider.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Providers;
 
-namespace SemanticKernel.Claude.POC;
+namespace SemanticKernel.MultiProvider.POC;
 
 class Program
 {
     static async Task Main(string[] args)
     {
-        Console.WriteLine("=== .NET Semantic Kernel + Claude C# SDK POC ===");
+        Console.WriteLine("=== Multi-AI Provider Semantic Kernel POC ===");
         Console.WriteLine();
 
         var host = CreateHostBuilder(args).Build();

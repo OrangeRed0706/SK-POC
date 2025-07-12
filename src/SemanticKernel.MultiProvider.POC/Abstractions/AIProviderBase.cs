@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace SemanticKernel.Claude.POC.Abstractions;
+namespace SemanticKernel.MultiProvider.POC.Abstractions;
 
 public abstract class AIProviderBase : IAIProvider
 {

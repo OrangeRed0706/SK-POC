@@ -1,4 +1,4 @@
-namespace SemanticKernel.Claude.POC.Models;
+namespace SemanticKernel.MultiProvider.POC.Models;
 
 public class AnthropicSettings
 {

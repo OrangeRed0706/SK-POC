@@ -2,12 +2,12 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
-using SemanticKernel.Claude.POC.Models;
+using SemanticKernel.MultiProvider.POC.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SemanticKernel.Claude.POC.Services;
+namespace SemanticKernel.MultiProvider.POC.Services;
 
 public class ClaudeSemanticKernelService
 {

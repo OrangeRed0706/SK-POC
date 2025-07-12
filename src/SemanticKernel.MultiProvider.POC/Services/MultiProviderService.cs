@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using SemanticKernel.Claude.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Abstractions;
 
-namespace SemanticKernel.Claude.POC.Services;
+namespace SemanticKernel.MultiProvider.POC.Services;
 
 public class MultiProviderService
 {

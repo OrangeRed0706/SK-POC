@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SemanticKernel.Claude.POC.Abstractions;
-using SemanticKernel.Claude.POC.Configuration;
-using SemanticKernel.Claude.POC.Providers;
+using SemanticKernel.MultiProvider.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Configuration;
+using SemanticKernel.MultiProvider.POC.Providers;
 
-namespace SemanticKernel.Claude.POC.Services;
+namespace SemanticKernel.MultiProvider.POC.Services;
 
 public class AIProviderFactory : IAIProviderFactory
 {

@@ -26,19 +26,35 @@ cd SK-POC
 
 ### 2. 設定 API Key
 
-複製範例設定檔並填入您的 Anthropic API Key:
+複製範例設定檔並填入您的 AI 提供者 API Keys (只需設定您擁有的):
 
 ```bash
-cp src/SemanticKernel.Claude.POC/appsettings.example.json src/SemanticKernel.Claude.POC/appsettings.json
+cp src/SemanticKernel.MultiProvider.POC/appsettings.example.json src/SemanticKernel.MultiProvider.POC/appsettings.json
 ```
 
-編輯 `src/SemanticKernel.Claude.POC/appsettings.json`:
+編輯 `src/SemanticKernel.MultiProvider.POC/appsettings.json`:
 
 ```json
 {
-  "AnthropicSettings": {
-    "ApiKey": "YOUR_ANTHROPIC_API_KEY_HERE",
-    "Model": "claude-3-5-sonnet-20241022"
+  "AISettings": {
+    "DefaultProvider": "Claude",
+    "Claude": {
+      "ApiKey": "YOUR_ANTHROPIC_API_KEY_HERE",
+      "Model": "claude-3-5-sonnet-20241022"
+    },
+    "OpenAI": {
+      "ApiKey": "YOUR_OPENAI_API_KEY_HERE",
+      "Model": "gpt-4o"
+    },
+    "AzureOpenAI": {
+      "Endpoint": "https://your-resource.openai.azure.com/",
+      "ApiKey": "YOUR_AZURE_OPENAI_API_KEY_HERE",
+      "DeploymentName": "gpt-4o"
+    },
+    "Gemini": {
+      "ApiKey": "YOUR_GEMINI_API_KEY_HERE",
+      "Model": "gemini-1.5-pro"
+    }
   }
 }
 ```
@@ -48,7 +64,7 @@ cp src/SemanticKernel.Claude.POC/appsettings.example.json src/SemanticKernel.Cla
 ```bash
 dotnet restore
 dotnet build
-dotnet run --project src/SemanticKernel.Claude.POC
+dotnet run --project src/SemanticKernel.MultiProvider.POC
 ```
 
 ## 專案結構
@@ -56,17 +72,26 @@ dotnet run --project src/SemanticKernel.Claude.POC
 ```
 SK-POC/
 ├── src/                                    # 原始碼目錄
-│   └── SemanticKernel.Claude.POC/         # 主專案
-│       ├── SemanticKernel.Claude.POC.csproj  # 專案檔案
+│   └── SemanticKernel.MultiProvider.POC/  # 主專案
+│       ├── SemanticKernel.MultiProvider.POC.csproj  # 專案檔案
 │       ├── appsettings.example.json        # 設定檔範本
 │       ├── Program.cs                      # 主程式入口
-│       ├── Models/
-│       │   └── AnthropicSettings.cs       # Claude 設定模型
-│       ├── Services/
-│       │   ├── ClaudeSemanticKernelService.cs # 主要服務類別
-│       │   └── ClaudeChatCompletionService.cs # SK 聊天完成服務
-│       └── Examples/
-│           └── ClaudeIntegrationExamples.cs   # 整合範例
+│       ├── Abstractions/                   # 抽象層
+│       │   ├── IAIProvider.cs             # AI 提供者介面
+│       │   ├── IAIProviderFactory.cs      # 提供者工廠介面
+│       │   └── AIProviderBase.cs          # 提供者基底類別
+│       ├── Configuration/                  # 設定模型
+│       │   └── AISettings.cs             # 多提供者設定
+│       ├── Providers/                      # AI 提供者實作
+│       │   ├── ClaudeProvider.cs          # Claude 提供者
+│       │   ├── OpenAIProvider.cs          # OpenAI 提供者
+│       │   ├── AzureOpenAIProvider.cs     # Azure OpenAI 提供者
+│       │   └── GeminiProvider.cs          # Gemini 提供者
+│       ├── Services/                       # 服務層
+│       │   ├── AIProviderFactory.cs       # 提供者工廠
+│       │   └── MultiProviderService.cs    # 多提供者服務
+│       └── Examples/                       # 整合範例
+│           └── ClaudeIntegrationExamples.cs   # 範例程式
 ├── docs/                                   # 專案文檔
 │   └── ARCHITECTURE.md                     # 架構文檔
 ├── samples/                                # 使用範例

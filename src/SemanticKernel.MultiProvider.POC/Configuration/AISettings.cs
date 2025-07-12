@@ -1,6 +1,6 @@
-using SemanticKernel.Claude.POC.Abstractions;
+using SemanticKernel.MultiProvider.POC.Abstractions;
 
-namespace SemanticKernel.Claude.POC.Configuration;
+namespace SemanticKernel.MultiProvider.POC.Configuration;
 
 public class AISettings
 {

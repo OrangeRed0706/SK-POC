@@ -1,4 +1,4 @@
-namespace SemanticKernel.Claude.POC.Abstractions;
+namespace SemanticKernel.MultiProvider.POC.Abstractions;
 
 public interface IAIProvider
 {
