@@ -25,10 +25,10 @@ cd SK-POC
 複製範例設定檔並填入您的 Anthropic API Key:
 
 ```bash
-cp appsettings.example.json appsettings.json
+cp src/SemanticKernel.Claude.POC/appsettings.example.json src/SemanticKernel.Claude.POC/appsettings.json
 ```
 
-編輯 `appsettings.json`:
+編輯 `src/SemanticKernel.Claude.POC/appsettings.json`:
 
 ```json
 {
@@ -44,23 +44,36 @@ cp appsettings.example.json appsettings.json
 ```bash
 dotnet restore
 dotnet build
-dotnet run
+dotnet run --project src/SemanticKernel.Claude.POC
 ```
 
 ## 專案結構
 
 ```
 SK-POC/
-├── SemanticKernel.Claude.POC.csproj  # 專案檔案
-├── appsettings.example.json          # 設定檔範本
-├── Program.cs                        # 主程式入口
-├── Models/
-│   └── AnthropicSettings.cs         # Claude 設定模型
-├── Services/
-│   ├── ClaudeSemanticKernelService.cs # 主要服務類別
-│   └── ClaudeChatCompletionService.cs # SK 聊天完成服務
-└── Examples/
-    └── ClaudeIntegrationExamples.cs  # 整合範例
+├── src/                                    # 原始碼目錄
+│   └── SemanticKernel.Claude.POC/         # 主專案
+│       ├── SemanticKernel.Claude.POC.csproj  # 專案檔案
+│       ├── appsettings.example.json        # 設定檔範本
+│       ├── Program.cs                      # 主程式入口
+│       ├── Models/
+│       │   └── AnthropicSettings.cs       # Claude 設定模型
+│       ├── Services/
+│       │   ├── ClaudeSemanticKernelService.cs # 主要服務類別
+│       │   └── ClaudeChatCompletionService.cs # SK 聊天完成服務
+│       └── Examples/
+│           └── ClaudeIntegrationExamples.cs   # 整合範例
+├── docs/                                   # 專案文檔
+│   └── ARCHITECTURE.md                     # 架構文檔
+├── samples/                                # 使用範例
+│   └── BasicUsage.md                       # 基本使用說明
+├── tests/                                  # 測試專案 (待新增)
+├── SK-POC.sln                             # Visual Studio 解決方案檔案
+├── LICENSE                                 # MIT 授權條款
+├── CONTRIBUTING.md                         # 貢獻指南
+├── .editorconfig                          # 編輯器設定
+├── .gitignore                             # Git 忽略檔案
+└── README.md                              # 專案說明
 ```
 
 ## 使用的套件版本
