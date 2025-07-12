@@ -16,6 +16,10 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.60.0-alpha" />
     <PackageReference Include="Anthropic.SDK" Version="5.4.3" />
     
+    <!-- Model Context Protocol -->
+    <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.2" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.6.0" />
+    
     <!-- Configuration and Hosting -->
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />

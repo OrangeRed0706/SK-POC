@@ -1,6 +1,6 @@
-# Multi-AI Provider Semantic Kernel POC
+# Multi-AI Provider MCP Integration POC
 
-這是一個展示如何整合多個 AI 提供者與 .NET Semantic Kernel 的概念驗證專案，支援 Claude、OpenAI、Azure OpenAI 和 Google Gemini。
+這是一個展示如何整合多個 AI 提供者與 Model Context Protocol (MCP) 的概念驗證專案，讓使用者可以透過 API Key 選擇 AI 提供者並呼叫 MCP 功能。
 
 ## 功能特色
 
@@ -9,11 +9,14 @@
   - OpenAI GPT-4o (Semantic Kernel)
   - Azure OpenAI (Semantic Kernel)
   - Google Gemini (Semantic Kernel Alpha)
-- **🔄 智慧提供者管理**: 自動偵測可用提供者、優雅的錯誤處理
-- **⚡ 多種處理模式**: 單一提供者測試、多提供者比較、協作式處理
-- **📡 串流支援**: 所有提供者的實時回應
-- **🎛️ 靈活配置**: 每個提供者的獨立設定和模型選擇
-- **🔀 動態切換**: 執行時選擇和比較不同 AI 提供者
+- **🔧 MCP 工具整合**: 支援各種 MCP 工具呼叫
+  - 檔案系統操作 (讀取/寫入)
+  - 網路搜尋
+  - 計算功能
+  - 資料庫查詢
+- **🤝 AI + MCP 協作**: AI 提供者與 MCP 工具的智慧整合
+- **⚙️ 靈活配置**: 每個提供者的獨立設定和模型選擇
+- **🔀 動態選擇**: 執行時選擇 AI 提供者和 MCP 工具
 
 ## 快速開始
 
@@ -109,40 +112,36 @@ SK-POC/
 
 - **Microsoft.SemanticKernel**: 1.60.0 (最新穩定版)
 - **Anthropic.SDK**: 5.4.3 (功能完整的非官方 SDK)
+- **ModelContextProtocol**: 0.3.0-preview.2 (MCP 整合)
+- **Microsoft.Extensions.AI**: 9.6.0 (AI 抽象層)
 - **Microsoft.Extensions.***: 8.0.1+ (相依套件)
 
 ## 核心功能展示
 
-### 1. 基本 Claude API 呼叫
-直接使用 Anthropic.SDK 與 Claude API 互動。
+### 1. AI 提供者選擇與測試
+選擇不同的 AI 提供者進行對話測試。
 
-### 2. Semantic Kernel 基本功能
-使用 Semantic Kernel 的提示工程和函數呼叫功能。
+### 2. MCP 工具呼叫
+直接呼叫各種 MCP 工具，如檔案操作、網路搜尋等。
 
-### 3. 整合式處理
-結合 Claude 和 Semantic Kernel，先用 Claude 處理，再用 SK 分析結果。
+### 3. AI + MCP 整合協作
+AI 提供者分析使用者需求，自動選擇合適的 MCP 工具，並整合結果。
 
-### 4. 串流回應
-實時顯示 Claude 的回應內容。
-
-### 5. 對話鏈範例
-維護多輪對話的上下文。
-
-### 6. 函數呼叫範例
-展示 Semantic Kernel 函數與 Claude 的協作。
-
-### 7. Claude 插件
-將 Claude 封裝為 Semantic Kernel 插件供其他功能呼叫。
+### 4. 互動式選單
+直觀的命令列介面，支援：
+- 提供者測試
+- MCP 工具呼叫
+- 整合式協作示範
 
 ## 技術架構
 
 本專案展示了以下整合模式：
 
-1. **直接整合**: 直接使用兩個 SDK 的 API
-2. **插件模式**: 將 Claude 包裝成 Semantic Kernel 插件
-3. **服務層整合**: 透過服務層統一管理兩個 SDK
+1. **多提供者抽象**: 透過 IAIProvider 介面統一不同 AI 服務
+2. **MCP 工具整合**: 使用 Model Context Protocol 進行工具呼叫
+3. **AI + MCP 協作**: AI 提供者與 MCP 工具的智慧協作
 4. **配置管理**: 使用 .NET 的配置系統管理 API 金鑰和設定
-5. **自訂聊天完成服務**: 實作 IChatCompletionService 介面
+5. **依賴注入**: 使用 Microsoft.Extensions.DependencyInjection
 
 ## 安全性
 
@@ -152,14 +151,15 @@ SK-POC/
 
 ## 注意事項
 
-- 需要有效的 Anthropic API Key
 - 支援 .NET 8.0
-- Claude 3.5 Sonnet 模型為預設選擇
+- 需要至少一個有效的 AI 提供者 API Key
+- 目前 MCP 工具為模擬實作，實際使用需連接真實 MCP 伺服器
 - 所有 API 呼叫都包含錯誤處理
 
 ## 擴展建議
 
-- 新增更多 Semantic Kernel 插件
+- 整合真實的 MCP 伺服器
+- 新增更多 MCP 工具支援
 - 實作自訂的對話記憶體管理
-- 整合其他 AI 服務
 - 新增單元測試和整合測試
+- 支援更多 AI 提供者
